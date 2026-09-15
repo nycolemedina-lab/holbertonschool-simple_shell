@@ -14,19 +14,17 @@ int main(int ac, char **av)
 	ssize_t nread;
 	pid_t child;
 	int status;
+	char *cmd;
 	char *args[2];
 
 	(void)ac;
 
 	while (1)
 	{
-		/* Print prompt only in interactive mode */
 		if (isatty(STDIN_FILENO))
 			write(STDOUT_FILENO, "#cisfun$ ", 9);
 
 		nread = getline(&line, &len, stdin);
-
-		/* Handle Ctrl+D / EOF */
 		if (nread == -1)
 		{
 			if (isatty(STDIN_FILENO))
@@ -35,15 +33,11 @@ int main(int ac, char **av)
 			exit(0);
 		}
 
-		/* Strip the newline character */
-		if (line[nread - 1] == '\n')
-			line[nread - 1] = '\0';
-
-		/* Ignore empty lines */
-		if (line[0] == '\0')
+		/* Extract the command token, ignoring spaces, tabs, and newlines */
+		cmd = strtok(line, " \t\r\n");
+		if (cmd == NULL)
 			continue;
 
-		/* Create child process */
 		child = fork();
 		if (child == -1)
 		{
@@ -54,7 +48,7 @@ int main(int ac, char **av)
 
 		if (child == 0)
 		{
-			args[0] = line;
+			args[0] = cmd;
 			args[1] = NULL;
 
 			if (execve(args[0], args, environ) == -1)
