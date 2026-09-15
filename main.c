@@ -13,9 +13,8 @@ int main(int ac, char **av)
 	size_t len = 0;
 	ssize_t nread;
 	pid_t child;
-	int status;
-	char *cmd;
-	char *args[2];
+	int status, i;
+	char *args[1024];
 
 	(void)ac;
 
@@ -33,35 +32,32 @@ int main(int ac, char **av)
 			exit(0);
 		}
 
-		/* Extract the command token, ignoring spaces, tabs, and newlines */
-		cmd = strtok(line, " \t\r\n");
-		if (cmd == NULL)
+		/* Parse input directly into args array */
+		args[0] = strtok(line, " \t\r\n");
+		if (args[0] == NULL)
 			continue;
 
+		i = 1;
+		while ((args[i] = strtok(NULL, " \t\r\n")) != NULL)
+			i++;
+
+		/* Execute command */
 		child = fork();
 		if (child == -1)
 		{
 			perror(av[0]);
-			free(line);
-			exit(1);
+			continue;
 		}
 
 		if (child == 0)
 		{
-			args[0] = cmd;
-			args[1] = NULL;
-
 			if (execve(args[0], args, environ) == -1)
-			{
 				perror(av[0]);
-				free(line);
-				exit(1);
-			}
+			free(line);
+			exit(1);
 		}
-		else
-		{
-			wait(&status);
-		}
+
+		wait(&status);
 	}
 
 	free(line);
