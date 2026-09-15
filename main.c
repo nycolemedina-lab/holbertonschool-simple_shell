@@ -13,8 +13,8 @@ int main(int ac, char **av)
 	size_t len = 0;
 	ssize_t nread;
 	pid_t child;
-	int status, i;
-	char *args[1024];
+	int status;
+	char *args[2];
 
 	(void)ac;
 
@@ -32,16 +32,12 @@ int main(int ac, char **av)
 			exit(0);
 		}
 
-		/* Parse input directly into args array */
+		/* Grab ONLY the first word as the executable command path */
 		args[0] = strtok(line, " \t\r\n");
 		if (args[0] == NULL)
 			continue;
+		args[1] = NULL;
 
-		i = 1;
-		while ((args[i] = strtok(NULL, " \t\r\n")) != NULL)
-			i++;
-
-		/* Execute command */
 		child = fork();
 		if (child == -1)
 		{
