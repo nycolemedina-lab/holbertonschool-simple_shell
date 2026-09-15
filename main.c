@@ -13,8 +13,9 @@ int main(int ac, char **av)
 	size_t len = 0;
 	ssize_t nread;
 	pid_t child;
-	int status;
-	char *args[2];
+	int status, i;
+	char *args[1024];
+	char *token;
 
 	(void)ac;
 
@@ -32,11 +33,19 @@ int main(int ac, char **av)
 			exit(0);
 		}
 
-		/* Grab ONLY the first word as the executable command path */
-		args[0] = strtok(line, " \t\r\n");
-		if (args[0] == NULL)
+		/* Extract all command words/arguments into args array */
+		token = strtok(line, " \t\r\n");
+		if (token == NULL)
 			continue;
-		args[1] = NULL;
+
+		i = 0;
+		while (token != NULL)
+		{
+			args[i] = token;
+			token = strtok(NULL, " \t\r\n");
+			i++;
+		}
+		args[i] = NULL;
 
 		child = fork();
 		if (child == -1)
