@@ -14,7 +14,6 @@ int main(int ac, char **av)
 	ssize_t nread;
 	pid_t child;
 	int status;
-	char *cmd;
 	char *args[2];
 
 	(void)ac;
@@ -33,35 +32,28 @@ int main(int ac, char **av)
 			exit(0);
 		}
 
-		/* Extract the command token, ignoring spaces, tabs, and newlines */
-		cmd = strtok(line, " \t\r\n");
-		if (cmd == NULL)
+		/* Grab ONLY the first word as the executable command path */
+		args[0] = strtok(line, " \t\r\n");
+		if (args[0] == NULL)
 			continue;
+		args[1] = NULL;
 
 		child = fork();
 		if (child == -1)
 		{
 			perror(av[0]);
-			free(line);
-			exit(1);
+			continue;
 		}
 
 		if (child == 0)
 		{
-			args[0] = cmd;
-			args[1] = NULL;
-
 			if (execve(args[0], args, environ) == -1)
-			{
 				perror(av[0]);
-				free(line);
-				exit(1);
-			}
+			free(line);
+			exit(1);
 		}
-		else
-		{
-			wait(&status);
-		}
+
+		wait(&status);
 	}
 
 	free(line);
