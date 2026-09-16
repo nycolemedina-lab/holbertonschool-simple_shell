@@ -16,6 +16,7 @@ int main(int ac, char **av)
 	int status, i;
 	char *args[1024];
 	char *token;
+	char *cmd_path;
 
 	(void)ac;
 
@@ -47,10 +48,19 @@ int main(int ac, char **av)
 		}
 		args[i] = NULL;
 
+		/*Added helper function to handle the path (in file handlepath.c)*/
+		cmd_path = find_in_path(args[0]);
+		if (cmd_path == NULL)
+		{
+			perror(av[0]);
+			continue;
+		}
+
 		child = fork();
 		if (child == -1)
 		{
 			perror(av[0]);
+			free(cmd_path);
 			continue;
 		}
 
@@ -58,11 +68,13 @@ int main(int ac, char **av)
 		{
 			if (execve(args[0], args, environ) == -1)
 				perror(av[0]);
+			free(cmd_path);
 			free(line);
 			exit(1);
 		}
 
 		wait(&status);
+		free(cmd_path);
 	}
 
 	free(line);
