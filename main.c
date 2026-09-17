@@ -13,7 +13,7 @@ int main(int ac, char **av)
 	size_t len = 0;
 	ssize_t nread;
 	pid_t child;
-	int status, i;
+	int status, i, last_status = 0;
 	char *args[1024];
 	char *token;
 	char *cmd_path;
@@ -31,7 +31,7 @@ int main(int ac, char **av)
 			if (isatty(STDIN_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
 			free(line);
-			exit(0);
+			exit(last_status);
 		}
 
 		token = strtok(line, " \t\r\n");
@@ -51,7 +51,7 @@ int main(int ac, char **av)
 		if (strcmp(args[0], "exit") == 0)
 		{
 			free(line);
-			exit(0);
+			exit(last_status);
 		}
 
 		/* Find command in PATH before forking */
@@ -59,6 +59,7 @@ int main(int ac, char **av)
 		if (cmd_path == NULL)
 		{
 			perror(av[0]);
+			last_status = 127;
 			continue;
 		}
 
@@ -80,9 +81,12 @@ int main(int ac, char **av)
 		}
 
 		wait(&status);
+		if (WIFEXITED(status))
+			last_status = WEXITSTATUS(status);
+
 		free(cmd_path);
 	}
 
 	free(line);
-	return (0);
+	return (last_status);
 }
