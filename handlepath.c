@@ -1,10 +1,11 @@
 #include "main.h"
+
 /**
-* find_in_path - searches PATH directories for an executable command
-* @command: the command typed by the user
-*
-* Return: dynamiclly allocated full path string in success, NULL in failure
-*/
+ * find_in_path - searches PATH directories for an executable command
+ * @command: the command typed by the user
+ *
+ * Return: dynamically allocated full path string on success, NULL on failure
+ */
 char *find_in_path(char *command)
 {
 	char *path_env;
@@ -46,6 +47,3 @@ char *find_in_path(char *command)
 	free(path_copy);
 	return (NULL);
 }
-
-
-
