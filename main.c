@@ -14,10 +14,10 @@ int main(int ac, char **av)
 	ssize_t nread;
 	pid_t child;
 	int status, i, last_status = 0;
+	int cmd_count = 0;
 	char *args[1024];
 	char *token;
 	char *cmd_path;
-	char cmd_count = 0;
 
 	(void)ac;
 
@@ -55,6 +55,15 @@ int main(int ac, char **av)
 		{
 			free(line);
 			exit(last_status);
+		}
+
+		/* Built-in: env */
+		if (strcmp(args[0], "env") == 0)
+		{
+			for (i = 0; environ && environ[i]; i++)
+				printf("%s\n", environ[i]);
+			last_status = 0;
+			continue;
 		}
 
 		/* Find command in PATH before forking */
