@@ -23,7 +23,7 @@ char *find_in_path(char *command)
 		return (NULL);
 	}
 
-	path_env = getenv("PATH");
+	path_env = _getenv("PATH");
 	if (!path_env || strlen(path_env) == 0)
 		return (NULL);
 
