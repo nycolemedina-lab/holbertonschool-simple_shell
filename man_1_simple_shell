@@ -1,1 +1,55 @@
-man page
+.TH HSH 1 "September 2026" "1.0" "Simple Shell Manual"
+.SH NAME
+hsh - simple Unix command line interpreter
+.SH SYNOPSIS
+.B ./hsh
+.SH DESCRIPTION
+.B hsh
+is a simple Unix command interpreter that reads user input from standard input, parses arguments, searches for executables, and executes programs in child processes.
+
+.PP
+When started in interactive mode (when standard input is attached to a terminal), \fBhsh\fP displays the prompt \fB#cisfun$\ \fP before reading each line of input. In non-interactive mode (such as when input is piped from another command), no prompt is printed.
+
+.SH BUILT-IN COMMANDS
+.TP
+.B exit
+Exits the shell. The exit status returned will be that of the last executed command.
+.TP
+.B env
+Prints all environment variables in the current process to standard output.
+
+.SH COMMAND EXECUTION
+If a specified command contains a slash (\fB/\fP), \fBhsh\fP attempts to execute it directly. Otherwise, it searches through the directory paths specified in the \fBPATH\fP environment variable. If the command is not found, an error message is written to standard error and the exit status is set to 127.
+
+.SH EXIT STATUS
+\fBhsh\fP returns the exit status of the last executed command. If an end-of-file (EOF/Ctrl+D) is received or \fBexit\fP is executed, the shell terminates with the status of the final executed command.
+
+.SH EXAMPLES
+Interactive execution:
+.IP
+.nf
+$ ./hsh
+#cisfun$ /bin/ls
+file1 file2 main.c
+#cisfun$ exit
+$
+.fi
+
+Non-interactive execution:
+.IP
+.nf
+$ echo "/bin/ls" | ./hsh
+file1 file2 main.c
+$
+.fi
+
+.SH SEE ALSO
+.BR access (2),
+.BR execve (2),
+.BR fork (2),
+.BR wait (2),
+.BR sh (1)
+
+.SH AUTHORS
+Nycole Medina
+Kevin Rodriguez
