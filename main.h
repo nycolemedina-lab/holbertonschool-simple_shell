@@ -10,6 +10,7 @@
 
 extern char **environ;
 
+char *_getenv(const char *name);
 char *find_in_path(char *command);
 
 #endif /* MAIN_H */
