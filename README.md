@@ -62,76 +62,35 @@ The `env` built-in is implemented to print the current environment.
 
 
 ## Flowchart 📌
-```text
-               +----------------------------------+
-               |          Start: ./hsh            |
-               +----------------------------------+
-                                |
-                                v
-                   +--------------------------+
-                   |  isatty(STDIN_FILENO)?   |
-                   +--------------------------+
-                     /                      \
-               (Yes)/                        \(No)
-                   v                          v
-       +-----------------------+   +-----------------------+
-       |  Print "#cisfun$ "    |   | Read line (getline)   |
-       +-----------------------+   +-----------------------+
-                   |                          |
-                   +------------+-------------+
-                                |
-                                v
-                   +--------------------------+
-                   |  getline == -1 (EOF)?    |
-                   +--------------------------+
-                     /                      \
-               (Yes)/                        \(No)
-                   v                          v
-       +-----------------------+   +-----------------------+
-       | Free line             |   | cmd_count++           |
-       | exit(last_status)     |   | Tokenize into args[]  |
-       +-----------------------+   +-----------------------+
-                                              |
-                                              v
-                                   +---------------------+
-                                   | args[0] == NULL?    |--(Yes)--> [Loop]
-                                   +---------------------+
-                                              | (No)
-                                              v
-                                   +---------------------+
-                                   | args[0] == "exit"?  |--(Yes)--> Free line & exit(last_status)
-                                   +---------------------+
-                                              | (No)
-                                              v
-                                   +---------------------+
-                                   | args[0] == "env"?   |--(Yes)--> Print environ, last_status = 0 -> [Loop]
-                                   +---------------------+
-                                              | (No)
-                                              v
-                                   +---------------------+
-                                   | find_in_path()      |
-                                   +---------------------+
-                                              |
-                                              v
-                                   +---------------------+
-                                   | cmd_path == NULL?   |--(Yes)--> Print stderr error, last_status = 127 -> [Loop]
-                                   +---------------------+
-                                              | (No)
-                                              v
-                                   +---------------------+
-                                   |       fork()        |
-                                   +---------------------+
-                                      /               \
-                             (Child) /                 \ (Parent)
-                                    v                   v
-                     +--------------------+   +--------------------+
-                     | execve(cmd_path)   |   | wait(&status)      |
-                     | If fails: exit(1)  |   | Update last_status |
-                     +--------------------+   | Free cmd_path      |
-                                              +--------------------+
-                                                        |
-                                                        v
-                                                     [Loop]
+```mermaid
+flowchart TD
+    A(["Start: ./hsh"]) --> B{"isatty(STDIN_FILENO)?"}
+    B -- Yes --> C["Print Prompt '#cisfun$ '"]
+    B -- No --> D["Read line via getline()"]
+    C --> D
+    D --> E{"getline == -1 (EOF)?"}
+    E -- Yes --> F["Free line & exit(last_status)"]
+    E -- No --> G["Increment cmd_count++"]
+    G --> H["Tokenize input with strtok()"]
+    H --> I{"args[0] == NULL?"}
+    I -- Yes --> B
+    I -- No --> J{"args[0] == 'exit'?"}
+    J -- Yes --> K["Free line & exit(last_status)"]
+    J -- No --> L{"args[0] == 'env'?"}
+    L -- Yes --> M["Print environ array<br/>Set last_status = 0"]
+    M --> B
+    L -- No --> N["Call find_in_path(args[0])"]
+    N --> O{"cmd_path == NULL?"}
+    O -- Yes --> P["Print 'not found' error<br/>Set last_status = 127"]
+    P --> B
+    O -- No --> Q["fork() process"]
+    Q --> R{"Process Branch"}
+    R -- Child (pid == 0) --> S["execve(cmd_path, args, environ)"]
+    S -- On Error --> T["perror & exit(1)"]
+    R -- Parent (pid > 0) --> U["wait(&status)"]
+    U --> V["Update last_status = WEXITSTATUS(status)"]
+    V --> W["Free cmd_path"]
+    W --> B
 ```
 
 ## Usage 💻
