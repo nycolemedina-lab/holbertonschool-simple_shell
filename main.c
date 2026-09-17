@@ -17,6 +17,7 @@ int main(int ac, char **av)
 	char *args[1024];
 	char *token;
 	char *cmd_path;
+	char cmd_count = 0;
 
 	(void)ac;
 
@@ -33,6 +34,8 @@ int main(int ac, char **av)
 			free(line);
 			exit(last_status);
 		}
+
+		cmd_count++;
 
 		token = strtok(line, " \t\r\n");
 		if (token == NULL)
@@ -58,7 +61,7 @@ int main(int ac, char **av)
 		cmd_path = find_in_path(args[0]);
 		if (cmd_path == NULL)
 		{
-			perror(av[0]);
+			fprintf(stderr, "%s: %d: %s: not found\n", av[0], cmd_count, args[0]);
 			last_status = 127;
 			continue;
 		}
