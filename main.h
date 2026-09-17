@@ -12,5 +12,4 @@ extern char **environ;
 
 char *find_in_path(char *command);
 
-
 #endif /* MAIN_H */

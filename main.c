@@ -34,7 +34,6 @@ int main(int ac, char **av)
 			exit(0);
 		}
 
-		/* Extract all command words/arguments into args array */
 		token = strtok(line, " \t\r\n");
 		if (token == NULL)
 			continue;
@@ -55,7 +54,7 @@ int main(int ac, char **av)
 			exit(0);
 		}
 
-		/* Handle command lookup in PATH */
+		/* Find command in PATH before forking */
 		cmd_path = find_in_path(args[0]);
 		if (cmd_path == NULL)
 		{
