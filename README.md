@@ -27,13 +27,11 @@ The project consists of the following files:
 
 - `AUTHORS`
 - `README.md` (You're here!)
-- `_getenv.c`
-- `handlepath.c`
-- `getenv.c`
-- `handle_path.c`
+- `man_1_simple_shell`
 - `main.c`
 - `main.h`
-- `man_1_simple_shell`
+- `_getenv.c`
+- `handlepath.c`
 
 ## Features 🔨
 
@@ -65,7 +63,7 @@ The `env` built-in is implemented to print the current environment.
 
 ## Flowchart 📌
 ```text
-+----------------------------------+
+               +----------------------------------+
                |          Start: ./hsh            |
                +----------------------------------+
                                 |
