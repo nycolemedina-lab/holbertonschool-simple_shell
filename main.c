@@ -58,7 +58,7 @@ int main(int ac, char **av)
 		cmd_path = find_in_path(args[0]);
 		if (cmd_path == NULL)
 		{
-			perror(av[0]);
+			fprintf(stderr, "%s: %d: %s: not found\n", av[0], cmd_count, args[0]);
 			last_status = 127;
 			continue;
 		}
