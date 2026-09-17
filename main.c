@@ -48,7 +48,14 @@ int main(int ac, char **av)
 		}
 		args[i] = NULL;
 
-		/*Added helper function to handle the path (in file handlepath.c)*/
+		/* Built-in: exit */
+		if (strcmp(args[0], "exit") == 0)
+		{
+			free(line);
+			exit(0);
+		}
+
+		/* Handle command lookup in PATH */
 		cmd_path = find_in_path(args[0]);
 		if (cmd_path == NULL)
 		{
@@ -66,7 +73,7 @@ int main(int ac, char **av)
 
 		if (child == 0)
 		{
-			if (execve(args[0], args, environ) == -1)
+			if (execve(cmd_path, args, environ) == -1)
 				perror(av[0]);
 			free(cmd_path);
 			free(line);
